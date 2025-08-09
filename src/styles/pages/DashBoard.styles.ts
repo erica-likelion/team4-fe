@@ -2,8 +2,8 @@ import styled from "styled-components";
 
 export const DashBoardContainer = styled.div`
   display: flex;
-  width: 90%;
   flex-direction: column;
+  padding-left: 120px;
 `;
 
 export const TopWrapper = styled.div`
