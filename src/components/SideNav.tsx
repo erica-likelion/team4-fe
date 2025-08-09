@@ -8,15 +8,29 @@ import CommunitySvg_Un from "../assets/community_un.svg";
 import CommunitySvg_On from "../assets/community_on.svg";
 import MyPageSvg_Un from "../assets/person_un.svg";
 import MyPageSvg_On from "../assets/person_on.svg";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function SideNav() {
-  const [selectedItem, setSelectedItem] = useState<string | null>("dashboard");
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleItemClick = (item: string) => {
-    setSelectedItem(item === selectedItem ? null : item);
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setSelectedItem("dashboard");
+    } else if (location.pathname === "/create") {
+      setSelectedItem("create");
+    } else if (location.pathname === "/community") {
+      setSelectedItem("community");
+    } else if (location.pathname === "/my") {
+      setSelectedItem("myPage");
+    }
+  }, [location.pathname]);
+
+  const handleItemClick = (item: string, path: string) => {
+    setSelectedItem(item);
+    navigate(path);
   };
 
   return (
@@ -26,13 +40,9 @@ export default function SideNav() {
           <S.SideNavTitleImage src={CharacterSvg} />
           <S.SideNavTitle>홍보봇</S.SideNavTitle>
         </S.SideNavTitleWrap>
+
         {/* 대시보드 */}
-        <S.SideNavItemBox
-          onClick={() => {
-            handleItemClick("dashboard");
-            navigate("/");
-          }}
-        >
+        <S.SideNavItemBox onClick={() => handleItemClick("dashboard", "/")}>
           <S.SideNavItemImage_Un
             src={
               selectedItem === "dashboard" ? DashBoardSvg_On : DashBoardSvg_Un
@@ -45,12 +55,7 @@ export default function SideNav() {
         </S.SideNavItemBox>
 
         {/* AI Create */}
-        <S.SideNavItemBox
-          onClick={() => {
-            handleItemClick("create");
-            navigate("/create");
-          }}
-        >
+        <S.SideNavItemBox onClick={() => handleItemClick("create", "/create")}>
           <S.SideNavItemImage_Un
             src={selectedItem === "create" ? CreateSvg_On : CreateSvg_Un}
             alt="크리에이트 아이콘"
@@ -62,10 +67,7 @@ export default function SideNav() {
 
         {/* Community */}
         <S.SideNavItemBox
-          onClick={() => {
-            handleItemClick("community");
-            navigate("/community");
-          }}
+          onClick={() => handleItemClick("community", "/community")}
         >
           <S.SideNavItemImage_Un
             src={
@@ -79,12 +81,7 @@ export default function SideNav() {
         </S.SideNavItemBox>
 
         {/* My Page */}
-        <S.SideNavItemBox
-          onClick={() => {
-            handleItemClick("myPage");
-            navigate("/my");
-          }}
-        >
+        <S.SideNavItemBox onClick={() => handleItemClick("myPage", "/my")}>
           <S.SideNavItemImage_Un
             src={selectedItem === "myPage" ? MyPageSvg_On : MyPageSvg_Un}
             alt="마이페이지 아이콘"
