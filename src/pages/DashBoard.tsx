@@ -4,7 +4,7 @@ import { MyInfo } from "../components/MyInfo";
 import { useState } from "react";
 
 export function DashBoard() {
-  const [isMyInfoVisible, setIsMyInfoVisible] = useState(false);
+  const [isMyInfoVisible, setIsMyInfoVisible] = useState(true);
 
   const toggleMyInfo = () => {
     setIsMyInfoVisible(!isMyInfoVisible);
