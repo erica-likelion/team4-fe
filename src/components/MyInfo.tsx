@@ -4,11 +4,19 @@ import RightArrowSvg from "../assets/right.svg";
 import DefaultImg from "../assets/default.svg";
 import CharacterSvg from "../assets/character.svg";
 import WriteSvg from "../assets/write.svg";
+import Cancel from "../assets/cancel.svg";
 
-export function MyInfo() {
+export function MyInfo({
+  isVisible,
+  onClick,
+}: {
+  isVisible: boolean;
+  onClick: () => void;
+}) {
   const navigate = useNavigate();
   return (
-    <S.MyInfoContainer>
+    <S.MyInfoContainer isVisible={isVisible}>
+      <S.CancelImg src={Cancel} onClick={onClick} alt="캔슬" />
       <S.MyInfoTypeWrapper>
         <S.MyInfoTypeBox>
           <S.MyInfoType>

@@ -1,13 +1,26 @@
 import styled from "styled-components";
 
-export const MyInfoContainer = styled.div`
+export const MyInfoContainer = styled.div<{ isVisible: boolean }>`
   width: 388px;
+  height: 1024px;
   background: #fff;
   position: absolute;
   top: 0;
   right: 0;
   padding-top: 54px;
   padding-left: 33px;
+
+  transform: ${(props) =>
+    props.isVisible ? "translateX(0)" : "translateX(100%)"};
+
+  display: ${(props) => (props.isVisible ? "block" : "none")};
+`;
+
+export const CancelImg = styled.img`
+  position: absolute;
+  top: 18px;
+  width: 18px;
+  cursor: pointer;
 `;
 
 export const MyInfoTypeWrapper = styled.div`

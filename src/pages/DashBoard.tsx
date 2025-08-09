@@ -1,15 +1,26 @@
 import * as S from "../styles/pages/DashBoard.styles";
 import { Card } from "../components/Card";
 import { MyInfo } from "../components/MyInfo";
+import { useState } from "react";
 
 export function DashBoard() {
+  const [isMyInfoVisible, setIsMyInfoVisible] = useState(false);
+
+  const toggleMyInfo = () => {
+    setIsMyInfoVisible(!isMyInfoVisible);
+  };
+
   return (
     <S.DashBoardContainer>
       <S.TopWrapper>
-        <S.DashBoardTitle>홍보글 추천</S.DashBoardTitle>
+        <S.DashBoardBox>
+          <S.DashBoardTitle>홍보글 추천</S.DashBoardTitle>
+          <S.Button onClick={toggleMyInfo}>내 카페 정보 보기</S.Button>
+        </S.DashBoardBox>
+
         <S.Line />
         <S.DashBoardGrid>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((_, index) => {
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((_, index) => {
             return <Card key={index} />;
           })}
         </S.DashBoardGrid>
@@ -30,7 +41,7 @@ export function DashBoard() {
           })}
         </S.TipWrapper>
       </S.BottomWrapper>
-      <MyInfo />
+      <MyInfo isVisible={isMyInfoVisible} onClick={toggleMyInfo} />
     </S.DashBoardContainer>
   );
 }
