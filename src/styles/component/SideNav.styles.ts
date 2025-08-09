@@ -7,12 +7,12 @@ export const SideNavContainer = styled.div`
   border-right: 1px solid #bdbdbd;
   display: flex;
   flex-direction: column;
-  align-items: center;
 `;
 
 export const SideNavWrapper = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding-top: 30px;
   gap: 30px;
 `;
