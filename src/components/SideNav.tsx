@@ -4,7 +4,10 @@ export default function SideNav() {
   return (
     <S.SideNavContainer>
       <S.SideNavWrapper>
-        <S.SideNavTitle>Side Navigation</S.SideNavTitle>
+        <S.SideNavTitleWrap>
+          <S.SideNavTitleImage />
+          <S.SideNavTitle>홍보봇</S.SideNavTitle>
+        </S.SideNavTitleWrap>
       </S.SideNavWrapper>
     </S.SideNavContainer>
   );
