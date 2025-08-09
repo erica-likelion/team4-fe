@@ -1,32 +1,29 @@
 import styled from "styled-components";
-import CharacterSvg from "../../assets/character.svg";
-import DashBoardSvg_Un from "../../assets/dashboard_un.svg";
-import DashBoardSvg_On from "../../assets/dashboard_on.svg";
-import CreateSvg_Un from "../../assets/create_un.svg";
-import CreateSvg_On from "../../assets/create_on.svg";
-import CommunitySvg_Un from "../../assets/community_un.svg";
-import CommunitySvg_On from "../../assets/community_on.svg";
-import MyPageSvg_Un from "../../assets/person_un.svg";
-import MyPageSvg_On from "../../assets/person_on.svg";
 
 export const SideNavContainer = styled.div`
   width: 120px;
-  height: 100%;
+  min-height: 100%;
   background-color: #f2f2f2;
   border-right: 1px solid #bdbdbd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const SideNavWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
   padding-top: 30px;
   gap: 30px;
 `;
 
 export const SideNavTitleWrap = styled.div`
-  list-style-type: none;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 `;
 
-export const SideNavTitleImage = styled(CharacterSvg)`
+export const SideNavTitleImage = styled.img`
   width: 34px;
   height: 34px;
 `;
@@ -45,44 +42,23 @@ export const SideNavItemBox = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 2px;
+  cursor: pointer;
 `;
 
-export const SideNavItemDashBoard_Un = styled(DashBoardSvg_Un)`
+export const SideNavItemImage_Un = styled.img`
   width: 30px;
   height: 30px;
 `;
 
-export const SideNavItemDashBoard_On = styled(DashBoardSvg_On)`
+export const SideNavItemImage_On = styled.img`
   width: 30px;
   height: 30px;
 `;
 
-export const SideNavItemCreate_Un = styled(CreateSvg_Un)`
-  width: 30px;
-  height: 30px;
-`;
-
-export const SideNavItemCommunity_Un = styled(CommunitySvg_Un)`
-  width: 30px;
-  height: 30px;
-`;
-
-export const SideNavItemCreate_On = styled(CreateSvg_On)`
-  width: 30px;
-  height: 30px;
-`;
-
-export const SideNavItemCommunity_On = styled(CommunitySvg_On)`
-  width: 30px;
-  height: 30px;
-`;
-
-export const SideNavItemMyPage_Un = styled(MyPageSvg_Un)`
-  width: 30px;
-  height: 30px;
-`;
-
-export const SideNavItemMyPage_On = styled(MyPageSvg_On)`
-  width: 30px;
-  height: 30px;
+export const SideNavItemTitle = styled.p<{ selected: boolean }>`
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: ${(props) => (props.selected ? "#f35400" : "#001d3d")};
 `;

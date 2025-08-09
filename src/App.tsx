@@ -12,8 +12,8 @@ import { Community } from "./pages/Community";
  * 사용할 때는 태그를 이름명으로 대체
  */
 const AppContainer = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 100dvw;
+  height: 100dvh;
   display: flex;
   margin: 0;
   padding: 0;
