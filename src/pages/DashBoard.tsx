@@ -1,5 +1,6 @@
 import * as S from "../styles/pages/DashBoard.styles";
 import { Card } from "../components/Card";
+import { MyInfo } from "../components/MyInfo";
 
 export function DashBoard() {
   return (
@@ -29,6 +30,7 @@ export function DashBoard() {
           })}
         </S.TipWrapper>
       </S.BottomWrapper>
+      <MyInfo />
     </S.DashBoardContainer>
   );
 }
