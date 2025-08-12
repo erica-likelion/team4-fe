@@ -6,13 +6,17 @@ export const CreateContainer = styled.div`
   width: 100%;
 `;
 
-export const LeftContainer = styled.div`
+export const LeftWrap = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding-top: 53px;
-  padding-left: 44px;
+  align-items: center;
+  width: 100%;
+`;
+
+export const LeftContainer = styled.div`
   width: 50%;
+  display: flex;
+  padding-top: 53px;
   min-width: 643px;
 `;
 
