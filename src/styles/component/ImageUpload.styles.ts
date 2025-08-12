@@ -5,7 +5,6 @@ export const ImageUploadContainer = styled.div`
   width: 544px;
   height: 238px;
   flex-direction: column;
-  align-items: center;
   margin-top: 25px;
 `;
 
@@ -53,7 +52,8 @@ export const ImageUploadButtonBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: center;
+  width: 80px;
+  height: 100px;
 `;
 
 export const ImageUploadButton = styled.div`
@@ -61,11 +61,8 @@ export const ImageUploadButton = styled.div`
   flex-direction: column;
   width: 80px;
   height: 80px;
-  padding: 25px 20px;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
   border-radius: 10px;
   border: 1px dashed #828282;
   background: #fff;
@@ -84,6 +81,7 @@ export const ImageLabel = styled.span`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  text-align: center;
 `;
 
 export const ImagePreview = styled.div`

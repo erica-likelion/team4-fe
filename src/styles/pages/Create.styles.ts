@@ -9,8 +9,9 @@ export const CreateContainer = styled.div`
 export const LeftContainer = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   padding-top: 53px;
+  padding-left: 44px;
   width: 50%;
   min-width: 643px;
 `;

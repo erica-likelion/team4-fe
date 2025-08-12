@@ -2,11 +2,15 @@ import * as S from "../styles/component/ImageUpload.styles";
 import InfoImage from "../assets/information.svg";
 import PlusIcon from "../assets/plus.svg";
 import DeleteIcon from "../assets/img-cancel.svg";
-import { useState } from "react";
 
-export function ImageUpload() {
-  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
+interface ImageUploadProps {
+  images: { file: File; preview: string }[];
+  setImages: React.Dispatch<
+    React.SetStateAction<{ file: File; preview: string }[]>
+  >;
+}
 
+export function ImageUpload({ images, setImages }: ImageUploadProps) {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList) return;
