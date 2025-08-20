@@ -3,6 +3,7 @@ import * as S from "../styles/component/Modal.styles";
 import DefaultImg from "../assets/default.svg";
 import CommentImg from "../assets/comment.svg";
 import CancelImg from "../assets/cancel.svg";
+import HeartSvg from "../assets/heart_fill.svg";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import { useEffect, useState } from "react";
@@ -98,6 +99,27 @@ export default function Modal({
             <S.ChatContentBox>
               <S.ChatContent dangerouslySetInnerHTML={{ __html: safeHtml }} />
             </S.ChatContentBox>
+            {isChatVisible && (
+              <S.ModalChatting>
+                <S.ModalChattingCount>댓글 5개</S.ModalChattingCount>
+                {[1, 2, 3, 4, 5].map((_, index) => (
+                  <S.ChatBox key={index}>
+                    <S.ChatBoxImg src={DefaultImg} alt="User Image" />
+                    <S.ChatTextBox>
+                      <S.ChatBoxTop>
+                        <S.ChatBoxName>스타벅스</S.ChatBoxName>
+                        <S.ChatBoxContent>안녕하세요!</S.ChatBoxContent>
+                      </S.ChatBoxTop>
+                      <S.ChatBoxBottom>
+                        <S.ChatBoxDate>4일 전</S.ChatBoxDate>
+                        <S.ChatBoxLike>좋아요 6개</S.ChatBoxLike>
+                      </S.ChatBoxBottom>
+                    </S.ChatTextBox>
+                    <S.HeartImg src={HeartSvg} alt="Heart Image" />
+                  </S.ChatBox>
+                ))}
+              </S.ModalChatting>
+            )}
           </S.ChatWrapper>
         </S.ModalLayout>
       </S.ModalContainer>

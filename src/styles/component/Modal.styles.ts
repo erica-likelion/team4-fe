@@ -118,6 +118,7 @@ export const ChatWrapper = styled.div`
   align-items: center;
   gap: 20px;
   margin-top: 24px;
+  position: relative;
 `;
 
 export const ChatTitleBox = styled.div`
@@ -198,4 +199,103 @@ export const ChatContent = styled.p`
     list-style: disc;
     margin: 4px 0;
   }
+`;
+
+export const ModalChatting = styled.div`
+  width: 389px;
+  height: 503px;
+  overflow-y: auto;
+  flex-shrink: 0;
+  border-radius: 24px;
+  background: #001d3d;
+  position: absolute;
+  top: -25px;
+  right: 49px;
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+  padding-top: 20px;
+  padding-left: 32px;
+`;
+
+export const ModalChattingCount = styled.p`
+  color: #fff;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+`;
+
+export const ChatBox = styled.div`
+  display: flex;
+  width: 330px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 15px;
+`;
+
+export const ChatBoxImg = styled.img`
+  width: 38px;
+  height: 38px;
+  border-radius: 38px;
+`;
+
+export const ChatTextBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  flex: 1 0 0;
+  align-self: stretch;
+`;
+
+export const HeartImg = styled.img`
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+`;
+
+export const ChatBoxTop = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  align-self: stretch;
+`;
+
+export const ChatBoxName = styled.p`
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+`;
+export const ChatBoxContent = styled.p`
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+`;
+
+export const ChatBoxBottom = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  align-self: stretch;
+`;
+export const ChatBoxDate = styled.p`
+  color: #bdbdbd;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
+`;
+
+export const ChatBoxLike = styled.p`
+  color: #bdbdbd;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 350;
+  line-height: normal;
 `;
