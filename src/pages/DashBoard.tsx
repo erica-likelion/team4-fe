@@ -6,8 +6,8 @@ import { AnimatePresence } from "framer-motion";
 import Modal from "../components/Modal";
 
 export function DashBoard() {
-  const [isMyInfoVisible, setIsMyInfoVisible] = useState(true);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isMyInfoVisible, setIsMyInfoVisible] = useState<boolean>(true);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const toggleMyInfo = () => {
     setIsMyInfoVisible(!isMyInfoVisible);

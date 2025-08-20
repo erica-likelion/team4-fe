@@ -110,3 +110,92 @@ export const ModalCancelImg = styled.img`
   height: 30px;
   cursor: pointer;
 `;
+
+export const ChatWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-top: 24px;
+`;
+
+export const ChatTitleBox = styled.div`
+  display: flex;
+  width: 970px;
+  padding: 10px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #dbdbdb;
+`;
+
+export const ChatTitleDate = styled.p`
+  display: flex;
+  justify-content: center;
+  color: #828282;
+  font-family: "Noto Sans KR";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: normal;
+`;
+
+export const ChatTitle = styled.p`
+  color: #000;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+`;
+
+export const ChatContentBox = styled.div`
+  display: flex;
+  width: 970px;
+  padding: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  max-height: calc(100vh - 300px);
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+`;
+
+export const ChatContent = styled.p`
+  width: 615px;
+  line-height: 1.7;
+  color: #111;
+
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin: 16px 0;
+  }
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 14px 0;
+  }
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 12px 0;
+  }
+  p {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+  ul {
+    padding-left: 20px;
+  }
+  li {
+    list-style: disc;
+    margin: 4px 0;
+  }
+`;
