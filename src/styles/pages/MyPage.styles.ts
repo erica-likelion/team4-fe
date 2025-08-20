@@ -119,7 +119,11 @@ export const Divider = styled.div`
   background: ${BORDER};
 `;
 
-export const Row = styled.div<{ $alignTop?: boolean; $mt?: number; $mb?: number }>`
+export const Row = styled.div<{
+  $alignTop?: boolean;
+  $mt?: number;
+  $mb?: number;
+}>`
   display: grid;
   grid-template-columns: 180px 1fr;
   align-items: ${(p) => (p.$alignTop ? "flex-start" : "center")};
@@ -165,10 +169,18 @@ export const TimeLine = styled.span`
   margin: 0;
   padding: 0;
 
-  .label { margin-right: 0; }   
-  .sep   { margin: 0; }       
-  .lp    { margin-left: 0; }    
-  .rp    { margin-left: 0; } 
+  .label {
+    margin-right: 0;
+  }
+  .sep {
+    margin: 0;
+  }
+  .lp {
+    margin-left: 0;
+  }
+  .rp {
+    margin-left: 0;
+  }
 `;
 
 export const TimeInput = styled(Input)`
@@ -214,7 +226,7 @@ export const Counter = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #AFAFAF;
+  color: #afafaf;
   font-size: 10px;
   font-weight: 700;
 `;
@@ -241,7 +253,7 @@ export const ProfileIcon160 = styled.label<{ $empty?: boolean }>`
 
   border-radius: 50%;
   overflow: hidden;
-  background: #D9D9D9; /* 항상 회색으로 시작 */
+  background: #d9d9d9; /* 항상 회색으로 시작 */
 `;
 
 export const BlankBox = styled.div`
@@ -386,7 +398,7 @@ export const Checkbox = styled.input.attrs({ type: "checkbox" })`
 
 export const TabsSprite = styled.div<{ $bg: string }>`
   position: relative;
-  width: 194px;  /* 기본 SVG 크기 (JSX에서 250×48로 덮어씀) */
+  width: 194px; /* 기본 SVG 크기 (JSX에서 250×48로 덮어씀) */
   height: 37px;
   flex: 0 0 auto;
   background: ${({ $bg }) => `url(${$bg}) no-repeat center / contain`};
@@ -469,8 +481,14 @@ export const SavedBody = styled(LogsBody)`
   overflow-y: auto;
   overflow-x: hidden;
   padding-top: 30px;
-  padding-right: 16px; 
+  padding-right: 16px;
   min-height: 0;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 export const SavedGrid = styled.div`
@@ -548,7 +566,8 @@ export const MetaIcon = styled.span<{ $type: "heart" | "eye" }>`
   width: 14px;
   height: 14px;
   display: inline-block;
-  background: url(${(p) => (p.$type === "heart" ? heartUrl : eyeUrl)}) no-repeat center / contain;
+  background: url(${(p) => (p.$type === "heart" ? heartUrl : eyeUrl)}) no-repeat
+    center / contain;
 `;
 
 /* 홍보글 목록 */
@@ -599,17 +618,22 @@ export const ArticleTitle = styled.div`
 
 export const ArticlesBody = styled(LogsBody)`
   padding: 51px 102px 40px 81px; /* L=81, R=102, T=51 */
-  overflow: hidden;              /* 뷰포트에서만 스크롤 */
+  overflow: hidden; /* 뷰포트에서만 스크롤 */
 `;
 
 export const ArticlesViewport = styled.div`
-  height: calc(126px * 5 + 45px * 4);  /* 810px (5행, 행 간격 45px) */
+  height: calc(126px * 5 + 45px * 4); /* 810px (5행, 행 간격 45px) */
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
   scroll-snap-type: y mandatory;
   overscroll-behavior: contain;
   scrollbar-gutter: stable both-edges;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 `;
 
 export const ArticleTime = styled.div`

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useRef, useId } from "react";
 import * as S from "../styles/pages/MyPage.styles";
 import tabsInfoOn from "../assets/mypage_info.svg";
 import tabsLogsOn from "../assets/mypage_logs.svg";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Form = {
   name: string;
@@ -62,7 +63,8 @@ export function MyPage() {
       const a = localStorage.getItem(LS_AMENITIES);
       if (f) setForm(JSON.parse(f));
       if (p && !p.startsWith("blob:")) setProfile({ url: p }); // blob 저장 무시
-      if (m) setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
+      if (m)
+        setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
       if (a) setAmenities(JSON.parse(a));
     } catch {}
   }, []);
@@ -75,7 +77,10 @@ export function MyPage() {
         const safeProfileUrl =
           profile?.url && !profile.url.startsWith("blob:") ? profile.url : "";
         localStorage.setItem(LS_PROFILE, safeProfileUrl);
-        localStorage.setItem(LS_MENU, JSON.stringify(menuImages.map((i) => i.url)));
+        localStorage.setItem(
+          LS_MENU,
+          JSON.stringify(menuImages.map((i) => i.url))
+        );
         localStorage.setItem(LS_AMENITIES, JSON.stringify(amenities));
       } catch {}
     }, 300);
@@ -95,19 +100,6 @@ export function MyPage() {
       const url = URL.createObjectURL(f);
       return { file: f, url };
     });
-  };
-
-  const addMenus = (files: FileList | null) => {
-    if (!files) return;
-    const next = Array.from(files).map((f) => ({
-      file: f,
-      url: URL.createObjectURL(f),
-    }));
-    setMenuImages((prev) => [...prev, ...next]);
-  };
-
-  const removeMenu = (idx: number) => {
-    setMenuImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const toggleAmenity = (label: string) => {
@@ -141,12 +133,14 @@ export function MyPage() {
       <S.InfoInner>
         <S.TabRow style={{ marginTop: 46, marginLeft: "calc(141px - 292px)" }}>
           <S.TabsSprite
+            as={motion.div}
             $bg={activeTab === "info" ? tabsInfoOn : tabsLogsOn}
             role="tablist"
             aria-label="My Page tabs"
             style={{ width: 250, height: 48 }}
           >
             <S.TabHitInfo
+              as={motion.button}
               role="tab"
               aria-selected={activeTab === "info"}
               aria-label="나의 정보"
@@ -185,7 +179,10 @@ export function MyPage() {
                   <S.Label>프로필 이미지</S.Label>
                   <S.Value>
                     <S.Profile>
-                      <S.ProfileIcon160 $empty={isProfileEmpty} htmlFor={fileInputId}>
+                      <S.ProfileIcon160
+                        $empty={isProfileEmpty}
+                        htmlFor={fileInputId}
+                      >
                         {!isProfileEmpty ? (
                           <S.ProfileImg
                             key={profile!.url}
@@ -240,32 +237,32 @@ export function MyPage() {
                   <S.Label>영업 시간</S.Label>
                   <S.Value>
                     <S.TimeLine>
-                       <span className="label">매일</span>
+                      <span className="label">매일</span>
 
-                       <S.TimeInput
-                          value={form.open}
-                          onChange={onChange("open")}
-                          placeholder="10:00"
-                          size={Math.max(form.open.length, 4)}
-                        />
-                       <span className="sep">~</span>
+                      <S.TimeInput
+                        value={form.open}
+                        onChange={onChange("open")}
+                        placeholder="10:00"
+                        size={Math.max(form.open.length, 4)}
+                      />
+                      <span className="sep">~</span>
 
-                       <S.TimeInput
-                          value={form.close}
-                          onChange={onChange("close")}
-                          placeholder="21:00"
-                          size={Math.max(form.close.length, 4)}
-                        />
+                      <S.TimeInput
+                        value={form.close}
+                        onChange={onChange("close")}
+                        placeholder="21:00"
+                        size={Math.max(form.close.length, 4)}
+                      />
 
-                       <span className="lp">(라스트 오더</span>
+                      <span className="lp">(라스트 오더</span>
 
-                       <S.TimeInput
-                          value={form.lastOrder}
-                          onChange={onChange("lastOrder")}
-                          placeholder="20:30"
-                          size={Math.max(form.lastOrder.length, 4)}
-                        />
-                       <span className="rp">)</span>
+                      <S.TimeInput
+                        value={form.lastOrder}
+                        onChange={onChange("lastOrder")}
+                        placeholder="20:30"
+                        size={Math.max(form.lastOrder.length, 4)}
+                      />
+                      <span className="rp">)</span>
                     </S.TimeLine>
                   </S.Value>
                 </S.Row>
@@ -338,13 +335,13 @@ export function MyPage() {
           >
             <S.TabHitInfo
               role="tab"
-              aria-selected={isInfo}          // ✅ 비교 대신 불린 사용
+              aria-selected={isInfo} // ✅ 비교 대신 불린 사용
               aria-label="나의 정보"
               onClick={() => setActiveTab("info")}
             />
             <S.TabHitLogs
               role="tab"
-              aria-selected={!isInfo}         // ✅ 반대 불린
+              aria-selected={!isInfo} // ✅ 반대 불린
               aria-label="기록 보기"
               onClick={() => setActiveTab("logs")}
             />
@@ -391,11 +388,31 @@ export function MyPage() {
                 <S.ArticlesViewport>
                   <S.ArticleList>
                     {[
-                      { title: "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기", time: "1일 전" },
-                      { title: "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기", time: "7일 전" },
-                      { title: "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기", time: "7일 전" },
-                      { title: "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기", time: "7일 전" },
-                      { title: "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기", time: "7일 전" },
+                      {
+                        title:
+                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
+                        time: "1일 전",
+                      },
+                      {
+                        title:
+                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
+                        time: "7일 전",
+                      },
+                      {
+                        title:
+                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
+                        time: "7일 전",
+                      },
+                      {
+                        title:
+                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
+                        time: "7일 전",
+                      },
+                      {
+                        title:
+                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
+                        time: "7일 전",
+                      },
                     ].map((a, idx) => (
                       <S.ArticleItem key={idx}>
                         <S.ArticleThumb />

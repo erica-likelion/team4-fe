@@ -64,9 +64,10 @@ export default function Modal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
     >
-      <S.ModalContainer>
-        <S.ModalLayout>
+      <S.ModalContainer onClick={() => setIsModalVisible(false)}>
+        <S.ModalLayout onClick={(e) => e.stopPropagation()}>
           <S.ModalHeader>
             <S.ModalProfile>
               <S.ModalProfileImage src={DefaultImg} alt="Profile Image" />

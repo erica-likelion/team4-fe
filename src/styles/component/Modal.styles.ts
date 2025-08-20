@@ -158,7 +158,7 @@ export const ChatContentBox = styled.div`
   align-items: flex-start;
   gap: 10px;
 
-  max-height: calc(100vh - 300px);
+  height: 550px;
   overflow-y: auto;
 
   &::-webkit-scrollbar {
