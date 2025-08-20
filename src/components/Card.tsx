@@ -3,9 +3,13 @@ import DefaultImg from "../assets/default.svg";
 import LikeImg from "../assets/heart.svg";
 import ViewImg from "../assets/eye.svg";
 
-export function Card() {
+export function Card({
+  setIsModalVisible,
+}: {
+  setIsModalVisible: (isVisible: boolean) => void;
+}) {
   return (
-    <S.CardContainer>
+    <S.CardContainer onClick={() => setIsModalVisible(true)}>
       <S.CardImage src={DefaultImg} alt="Card Image" />
       <S.CardCaptionBox>
         <S.CardCaptionTitle>카페</S.CardCaptionTitle>

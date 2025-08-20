@@ -8,6 +8,7 @@ export const CardContainer = styled.div`
   align-items: flex-start;
   gap: 9px;
   position: relative;
+  cursor: pointer;
 `;
 
 export const CardImage = styled.img`
