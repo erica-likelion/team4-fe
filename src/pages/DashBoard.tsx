@@ -2,9 +2,12 @@ import * as S from "../styles/pages/DashBoard.styles";
 import { Card } from "../components/Card";
 import { MyInfo } from "../components/MyInfo";
 import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import Modal from "../components/Modal";
 
 export function DashBoard() {
-  const [isMyInfoVisible, setIsMyInfoVisible] = useState(true);
+  const [isMyInfoVisible, setIsMyInfoVisible] = useState<boolean>(true);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
   const toggleMyInfo = () => {
     setIsMyInfoVisible(!isMyInfoVisible);
@@ -21,7 +24,7 @@ export function DashBoard() {
         <S.Line />
         <S.DashBoardGrid>
           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((_, index) => {
-            return <Card key={index} />;
+            return <Card key={index} setIsModalVisible={setIsModalVisible} />;
           })}
         </S.DashBoardGrid>
       </S.TopWrapper>
@@ -42,6 +45,9 @@ export function DashBoard() {
         </S.TipWrapper>
       </S.BottomWrapper>
       <MyInfo isVisible={isMyInfoVisible} onClick={toggleMyInfo} />
+      <AnimatePresence>
+        {isModalVisible && <Modal setIsModalVisible={setIsModalVisible} />}
+      </AnimatePresence>
     </S.DashBoardContainer>
   );
 }
