@@ -118,6 +118,14 @@ export default function Modal({
                     <S.HeartImg src={HeartSvg} alt="Heart Image" />
                   </S.ChatBox>
                 ))}
+                <S.ChatInput
+                  placeholder="댓글 추가"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      alert("댓글 작성 기능은 아직 구현되지 않았습니다.");
+                    }
+                  }}
+                />
               </S.ModalChatting>
             )}
           </S.ChatWrapper>

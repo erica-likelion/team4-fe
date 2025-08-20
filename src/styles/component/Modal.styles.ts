@@ -299,3 +299,13 @@ export const ChatBoxLike = styled.p`
   font-weight: 350;
   line-height: normal;
 `;
+
+export const ChatInput = styled.input`
+  display: flex;
+  width: 335px;
+  height: 33px;
+  align-items: center;
+  border-radius: 100px;
+  background: #fff;
+  padding-left: 18px;
+`;
