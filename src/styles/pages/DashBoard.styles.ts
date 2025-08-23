@@ -79,14 +79,15 @@ export const TipWrapper = styled.div`
   margin-top: 18px;
 `;
 
-export const Tip = styled.div`
+export const Tip = styled.div<{ $Background: string }>`
   width: 211px;
   height: 254px;
   border-radius: 12px;
-  background: #d9d9d9;
+  background: ${({ $Background }) => $Background};
   padding-left: 16px;
   padding-top: 16px;
   margin-bottom: 75px;
+  cursor: pointer;
 `;
 
 export const TipTitle = styled.p`
@@ -104,4 +105,17 @@ export const TipDescription = styled.p`
   font-weight: 500;
   line-height: normal;
   margin-top: 11px;
+`;
+
+export const TipImageWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const TipImage = styled.img`
+  max-width: 100%;
+  max-height: 100%;
 `;
