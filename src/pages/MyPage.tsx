@@ -3,6 +3,7 @@ import * as S from "../styles/pages/MyPage.styles";
 import tabsInfoOn from "../assets/mypage_info.svg";
 import tabsLogsOn from "../assets/mypage_logs.svg";
 import { AnimatePresence, motion } from "framer-motion";
+import axios from "axios";
 
 type Form = {
   name: string;
@@ -13,6 +14,24 @@ type Form = {
   close: string;
   lastOrder: string;
   holiday: string;
+};
+
+type Promotion = {
+  id: number;
+  title?: string;
+  content?: string;
+  createdAt?: string;
+};
+
+// 훅이 아니라 헬퍼 함수이므로 컴포넌트 밖에 둬도 됨
+const timeFromNow = (iso?: string) => {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const diff = (Date.now() - d.getTime()) / 1000; // sec
+  if (diff < 60) return `${Math.floor(diff)}초 전`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
+  return `${Math.floor(diff / 86400)}일 전`;
 };
 
 const DEFAULT_FORM: Form = {
@@ -51,10 +70,38 @@ export function MyPage() {
   ];
   const [amenities, setAmenities] = useState<string[]>(amenitiesAll);
 
+  // ✅ 여기부터 추가된 부분 (컴포넌트 내부 최상단에 위치)
+  const [myPromotion, setMyPromotion] = useState<Promotion[]>([]);
+  const [promoLoading, setPromoLoading] = useState(true);
+  const [promoError, setPromoError] = useState<unknown>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setPromoLoading(true);
+        setPromoError(null);
+        const { data } = await axios.get<any>(
+          "http://3.34.142.160:8081/api/community/stores/1/promotions"
+        );
+        const raw = (data as any)?.data ?? data;
+        const list = Array.isArray(raw) ? raw : [];
+        if (mounted) setMyPromotion(list as Promotion[]);
+      } catch (e) {
+        if (mounted) setPromoError(e);
+        console.error("Error fetching promotions data:", e);
+      } finally {
+        if (mounted) setPromoLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputId = useId();
 
-  // 저장/로드
   useEffect(() => {
     try {
       const f = localStorage.getItem(LS_FORM);
@@ -63,13 +110,12 @@ export function MyPage() {
       const a = localStorage.getItem(LS_AMENITIES);
       if (f) setForm(JSON.parse(f));
       if (p && !p.startsWith("blob:")) setProfile({ url: p }); // blob 저장 무시
-      if (m)
-        setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
+      if (m) setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
       if (a) setAmenities(JSON.parse(a));
     } catch {}
   }, []);
 
-  // 자동 저장 (디바운스 300ms)
+  // 자동 저장 
   useEffect(() => {
     const t = setTimeout(() => {
       try {
@@ -77,10 +123,7 @@ export function MyPage() {
         const safeProfileUrl =
           profile?.url && !profile.url.startsWith("blob:") ? profile.url : "";
         localStorage.setItem(LS_PROFILE, safeProfileUrl);
-        localStorage.setItem(
-          LS_MENU,
-          JSON.stringify(menuImages.map((i) => i.url))
-        );
+        localStorage.setItem(LS_MENU, JSON.stringify(menuImages.map((i) => i.url)));
         localStorage.setItem(LS_AMENITIES, JSON.stringify(amenities));
       } catch {}
     }, 300);
@@ -386,41 +429,27 @@ export function MyPage() {
               <S.Divider />
               <S.ArticlesBody>
                 <S.ArticlesViewport>
-                  <S.ArticleList>
-                    {[
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "1일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                    ].map((a, idx) => (
-                      <S.ArticleItem key={idx}>
-                        <S.ArticleThumb />
-                        <S.ArticleTitle>{a.title}</S.ArticleTitle>
-                        <S.ArticleTime>{a.time}</S.ArticleTime>
-                      </S.ArticleItem>
-                    ))}
-                  </S.ArticleList>
+                  {promoLoading ? (
+                    <div style={{ padding: 16 }}>불러오는 중…</div>
+                  ) : promoError ? (
+                    <div style={{ padding: 16 }}>
+                      데이터를 불러오는 중 문제가 발생했어요.
+                    </div>
+                  ) : myPromotion.length === 0 ? (
+                    <div style={{ padding: 16 }}>등록된 홍보글이 없습니다.</div>
+                  ) : (
+                    <S.ArticleList>
+                      {myPromotion.map((p: Promotion) => (
+                        <S.ArticleItem key={p.id}>
+                          <S.ArticleThumb />
+                          <S.ArticleTitle>
+                            {p.title || p.content || "(제목 없음)"}
+                          </S.ArticleTitle>
+                          <S.ArticleTime>{timeFromNow(p.createdAt)}</S.ArticleTime>
+                        </S.ArticleItem>
+                      ))}
+                    </S.ArticleList>
+                  )}
                 </S.ArticlesViewport>
               </S.ArticlesBody>
             </S.ArticlesListCard>
