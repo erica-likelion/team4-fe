@@ -4,12 +4,20 @@ import { Card } from "../components/Card";
 import { AnimatePresence } from "framer-motion";
 import searchIconUrl from "../assets/search.svg";
 import Modal from "../components/Modal";
+import { MOCK_PROMOTIONS, Promotion } from "../constants/promotion";
 
 export function Community() {
   const [query, setQuery] = useState("");
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
-  const items = useMemo(() => Array.from({ length: 28 }), []);
+  const [selectedPromotion, setSelectedPromotion] = useState<Promotion>(
+    MOCK_PROMOTIONS[0]
+  );
+  const filteredPromotions = useMemo(() => {
+    if (!query.trim()) return MOCK_PROMOTIONS;
+    return MOCK_PROMOTIONS.filter((p) =>
+      p.title.toLowerCase().includes(query.toLowerCase())
+    );
+  }, [query]);
 
   return (
     <S.Container>
@@ -38,15 +46,24 @@ export function Community() {
       </S.Top>
 
       <S.Grid>
-        {items.map((_, i) => (
-          <S.GridItem key={i}>
-            <Card setIsModalVisible={setIsModalVisible} />
+        {filteredPromotions.map((promotion) => (
+          <S.GridItem key={promotion.id}>
+            <Card
+              data={promotion}
+              onClick={() => {
+                setSelectedPromotion(promotion);
+                setIsModalVisible(true);
+              }}
+            />
           </S.GridItem>
         ))}
       </S.Grid>
       {isModalVisible && (
         <AnimatePresence>
-          <Modal setIsModalVisible={setIsModalVisible} />
+          <Modal
+            setIsModalVisible={setIsModalVisible}
+            promotion={selectedPromotion}
+          />
         </AnimatePresence>
       )}
     </S.Container>

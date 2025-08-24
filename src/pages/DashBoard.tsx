@@ -8,6 +8,9 @@ import BlogPost from "../assets/blog-post.svg";
 import Convenece from "../assets/convenence.svg";
 import NoteBook from "../assets/notebook.svg";
 import { ModalTip } from "../components/ModalTip";
+import axios from "axios";
+import { useEffect } from "react";
+import { MOCK_PROMOTIONS, Promotion } from "../constants/promotion";
 
 const DATA = [
   {
@@ -42,10 +45,26 @@ export function DashBoard() {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [isTipVisible, setIsTipVisible] = useState<boolean>(false);
   const [selectedTip, setSelectedTip] = useState<DATAProps | null>(null);
+  const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(
+    null
+  );
 
   const toggleMyInfo = () => {
     setIsMyInfoVisible(!isMyInfoVisible);
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://3.34.142.160:8081/api/community/promotions"
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <S.DashBoardContainer>
@@ -57,9 +76,16 @@ export function DashBoard() {
 
         <S.Line />
         <S.DashBoardGrid>
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map((_, index) => {
-            return <Card key={index} setIsModalVisible={setIsModalVisible} />;
-          })}
+          {MOCK_PROMOTIONS.map((item) => (
+            <Card
+              key={item.id}
+              data={item}
+              onClick={() => {
+                setSelectedPromotion(item);
+                setIsModalVisible(true);
+              }}
+            />
+          ))}
         </S.DashBoardGrid>
       </S.TopWrapper>
       <S.BottomWrapper>
@@ -88,7 +114,12 @@ export function DashBoard() {
       </S.BottomWrapper>
       <MyInfo isVisible={isMyInfoVisible} onClick={toggleMyInfo} />
       <AnimatePresence>
-        {isModalVisible && <Modal setIsModalVisible={setIsModalVisible} />}
+        {isModalVisible && selectedPromotion && (
+          <Modal
+            setIsModalVisible={setIsModalVisible}
+            promotion={selectedPromotion}
+          />
+        )}
       </AnimatePresence>
       <AnimatePresence>
         {isTipVisible && (

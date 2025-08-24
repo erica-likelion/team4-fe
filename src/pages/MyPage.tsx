@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, useRef, useId } from "react";
 import * as S from "../styles/pages/MyPage.styles";
 import tabsInfoOn from "../assets/mypage_info.svg";
 import tabsLogsOn from "../assets/mypage_logs.svg";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
+import axios from "axios";
 
 type Form = {
   name: string;
@@ -34,11 +35,22 @@ const LS_AMENITIES = "mypage_amenities_v1";
 
 type Img = { file?: File; url: string };
 
+interface Promotion {
+  id: number;
+  title: string;
+  date: string;
+  image: string;
+  likeCount: number;
+  storeName: string;
+  storeLocation: string;
+}
+
 export function MyPage() {
   const [activeTab, setActiveTab] = useState<"info" | "logs">("info");
   const [form, setForm] = useState<Form>(DEFAULT_FORM);
   const [profile, setProfile] = useState<Img | null>(null);
   const [menuImages, setMenuImages] = useState<Img[]>([]);
+  const [myPromotion, setMyPromotion] = useState<Promotion[] | null>(null);
   const amenitiesAll = [
     "Wifi 제공",
     "콘센트 사용 가능",
@@ -53,6 +65,34 @@ export function MyPage() {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputId = useId();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://3.34.142.160:8081/api/mypage/store/1"
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://3.34.142.160:8081/api/community/stores/1/promotions"
+        );
+        setMyPromotion(response.data);
+      } catch (error) {
+        console.error("Error fetching promotions data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   // 저장/로드
   useEffect(() => {
@@ -356,17 +396,17 @@ export function MyPage() {
               <S.Divider />
               <S.SavedBody>
                 <S.SavedGrid>
-                  {Array.from({ length: 9 }).map((_, i) => (
+                  {myPromotion?.map((promotion, i) => (
                     <S.SavedCard key={i}>
                       <S.SavedThumb />
                       <S.SavedMeta>
                         <S.SavedBrandThumb />
-                        <span className="brand">스타벅스</span>
+                        <span className="brand">{promotion?.storeName}</span>
 
                         <span className="right">
                           <span className="group">
                             <S.MetaIcon $type="heart" />
-                            <span>26</span>
+                            <span>{promotion?.likeCount}</span>
                           </span>
                           <span className="group">
                             <S.MetaIcon $type="eye" />
@@ -387,37 +427,11 @@ export function MyPage() {
               <S.ArticlesBody>
                 <S.ArticlesViewport>
                   <S.ArticleList>
-                    {[
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "1일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                      {
-                        title:
-                          "바쁜 하루 속 여유를 찾다 – 스타벅스 안산점 방문기",
-                        time: "7일 전",
-                      },
-                    ].map((a, idx) => (
-                      <S.ArticleItem key={idx}>
+                    {myPromotion?.map((promotion) => (
+                      <S.ArticleItem key={promotion.id}>
                         <S.ArticleThumb />
-                        <S.ArticleTitle>{a.title}</S.ArticleTitle>
-                        <S.ArticleTime>{a.time}</S.ArticleTime>
+                        <S.ArticleTitle>{promotion.title}</S.ArticleTitle>
+                        <S.ArticleTime>{promotion.date}</S.ArticleTime>
                       </S.ArticleItem>
                     ))}
                   </S.ArticleList>

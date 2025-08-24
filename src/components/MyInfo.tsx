@@ -5,6 +5,8 @@ import DefaultImg from "../assets/default.svg";
 import CharacterSvg from "../assets/character.svg";
 import WriteSvg from "../assets/write.svg";
 import Cancel from "../assets/cancel.svg";
+import axios from "axios";
+import { useEffect } from "react";
 
 export function MyInfo({
   isVisible,
@@ -14,6 +16,20 @@ export function MyInfo({
   onClick: () => void;
 }) {
   const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://3.34.142.160:8081/api/mypage/store/1"
+        );
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <S.MyInfoContainer isVisible={isVisible}>
       <S.CancelImg src={Cancel} onClick={onClick} alt="캔슬" />

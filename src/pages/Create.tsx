@@ -1,14 +1,26 @@
 import { ImageUpload } from "../components/ImageUpload";
 import StoreInfo from "../components/StoreInfo";
 import * as S from "../styles/pages/Create.styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import HashTag from "../components/HashTag";
 import GPTResult from "../components/GPTResult";
+import axios from "axios";
 
 export function Create() {
   const [tagList, setTagList] = useState<string[]>([]);
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [request, setRequest] = useState<string>("");
+  const fetchData = async () => {
+    const response = await axios.post(
+      "http://3.34.142.160:8081/api/made/user-input",
+      {
+        storeId: 1,
+        userInput: "맛있는 커피를 마시고 싶어요",
+        prompt: request,
+      }
+    );
+    console.log(response.data);
+  };
 
   return (
     <S.CreateContainer>
@@ -28,7 +40,7 @@ export function Create() {
             />
           </S.RequestBox>
           <S.CreateButtonWrap>
-            <S.CreateButton>
+            <S.CreateButton onClick={fetchData}>
               <S.CreateButtonText>제작하기</S.CreateButtonText>
             </S.CreateButton>
           </S.CreateButtonWrap>
