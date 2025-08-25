@@ -6,7 +6,28 @@ import CharacterSvg from "../assets/character.svg";
 import WriteSvg from "../assets/write.svg";
 import Cancel from "../assets/cancel.svg";
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface MyInfo {
+  storeId: number;
+  storeName: string;
+  storeImage: string;
+  information: string;
+  location: string;
+  businessType: string;
+  openTime: number;
+  closeTime: number;
+  closedDays: string;
+  reservation: boolean;
+  menu: string;
+  count: number;
+  convenience: {
+    wifi: boolean;
+    outlet: boolean;
+    pet: boolean;
+    packagingDelivery: boolean;
+  };
+}
 
 export function MyInfo({
   isVisible,
@@ -16,18 +37,21 @@ export function MyInfo({
   onClick: () => void;
 }) {
   const navigate = useNavigate();
+  const [myInfo, setMyInfo] = useState<MyInfo | null>(null);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchStoreData = async () => {
       try {
         const response = await axios.get(
-          "http://3.34.142.160:8081/api/mypage/store/1"
+          "http://3.34.142.160:8081/api/dashboard/stores/22"
         );
         console.log(response.data);
+        setMyInfo(response.data);
       } catch (error) {
         console.error("Error fetching store data:", error);
       }
     };
-    fetchData();
+    fetchStoreData();
   }, []);
 
   return (
@@ -36,7 +60,7 @@ export function MyInfo({
       <S.MyInfoTypeWrapper>
         <S.MyInfoTypeBox>
           <S.MyInfoType>
-            <S.MyInfoTypeText>카페</S.MyInfoTypeText>
+            <S.MyInfoTypeText>{"카페"}</S.MyInfoTypeText>
           </S.MyInfoType>
           <S.MyGrade>
             <S.MyGradeText>Free Plan</S.MyGradeText>
@@ -50,20 +74,21 @@ export function MyInfo({
       </S.MyInfoTypeWrapper>
       <S.InfoProfileWrap>
         <S.InfoProfileBox>
-          <S.InfoProfileImage src={DefaultImg} alt="Profile" />
-          <S.InfoProfileStoreName>스타벅스</S.InfoProfileStoreName>
+          <S.InfoProfileImage src={myInfo?.storeImage} alt="Profile" />
+          <S.InfoProfileStoreName>{myInfo?.storeName}</S.InfoProfileStoreName>
           <S.InfoProfileStoreDescription>
-            바닷가 감성을 담은 여름 시즌 한정 카페
+            {myInfo?.information}
           </S.InfoProfileStoreDescription>
         </S.InfoProfileBox>
         <S.LocationBox>
           <S.SmallTitle>위치</S.SmallTitle>
-          <S.SmallDescription>안산시 상록구 사동 00-0000</S.SmallDescription>
+          <S.SmallDescription>{myInfo?.location}</S.SmallDescription>
         </S.LocationBox>
         <S.TimeBox>
           <S.SmallTitle>영업시간</S.SmallTitle>
           <S.SmallDescription>
-            매일 10:00 ~ 21:00(라스트 오더 20:30)
+            {`매일 ${myInfo?.openTime}:00 ~ ${myInfo?.closeTime}:00(라스트 오더
+            20:30)`}
           </S.SmallDescription>
         </S.TimeBox>
       </S.InfoProfileWrap>

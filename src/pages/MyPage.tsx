@@ -45,6 +45,27 @@ interface Promotion {
   storeLocation: string;
 }
 
+interface MyInfo {
+  storeId: number;
+  storeName: string;
+  storeImage: string;
+  information: string;
+  location: string;
+  businessType: string;
+  openTime: number;
+  closeTime: number;
+  closedDays: string;
+  reservation: boolean;
+  menu: string;
+  count: number;
+  convenience: {
+    wifi: boolean;
+    outlet: boolean;
+    pet: boolean;
+    packagingDelivery: boolean;
+  };
+}
+
 export function MyPage() {
   const [activeTab, setActiveTab] = useState<"info" | "logs">("info");
   const [form, setForm] = useState<Form>(DEFAULT_FORM);
@@ -62,6 +83,7 @@ export function MyPage() {
     "예약 가능",
   ];
   const [amenities, setAmenities] = useState<string[]>(amenitiesAll);
+  const [myInfo, setMyInfo] = useState<MyInfo | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const fileInputId = useId();
@@ -70,7 +92,7 @@ export function MyPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://3.34.142.160:8081/api/mypage/store/1"
+          "http://3.34.142.160:8081/api/dashboard/store/22"
         );
         console.log(response.data);
       } catch (error) {
@@ -92,6 +114,20 @@ export function MyPage() {
       }
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      try {
+        const response = await axios.get(
+          "http://3.34.142.160:8081/api/dashboard/stores/22"
+        );
+        setMyInfo(response.data);
+      } catch (error) {
+        console.error("Error fetching store data:", error);
+      }
+    };
+    fetchStoreData();
   }, []);
 
   // 저장/로드
@@ -204,14 +240,17 @@ export function MyPage() {
                 <S.Row $mb={60}>
                   <S.Label>상호명</S.Label>
                   <S.Value>
-                    <S.Input value={form.name} onChange={onChange("name")} />
+                    <S.Input
+                      value={myInfo?.storeName}
+                      onChange={onChange("name")}
+                    />
                   </S.Value>
                 </S.Row>
 
                 <S.Row $mb={60}>
                   <S.Label>업종</S.Label>
                   <S.Value>
-                    <S.Input value={form.type} onChange={onChange("type")} />
+                    <S.Input value={"카페"} onChange={onChange("type")} />
                   </S.Value>
                 </S.Row>
 
@@ -226,7 +265,7 @@ export function MyPage() {
                         {!isProfileEmpty ? (
                           <S.ProfileImg
                             key={profile!.url}
-                            src={profile!.url}
+                            src={myInfo?.storeImage}
                             alt=""
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
@@ -252,7 +291,7 @@ export function MyPage() {
                     <S.OneLinerWrap>
                       <S.OneLiner
                         maxLength={ONE_LINER_MAX}
-                        value={form.oneLiner}
+                        value={myInfo?.information}
                         onChange={onChange("oneLiner")}
                         placeholder="바닷가 감성을 담은 여름 시즌 한정 카페"
                       />
@@ -265,7 +304,7 @@ export function MyPage() {
                   <S.Label>위치</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.location}
+                      value={myInfo?.location}
                       onChange={onChange("location")}
                       placeholder="주소를 입력하세요"
                       style={{ width: "100%" }}
@@ -280,7 +319,7 @@ export function MyPage() {
                       <span className="label">매일</span>
 
                       <S.TimeInput
-                        value={form.open}
+                        value={`${myInfo?.openTime}:00`}
                         onChange={onChange("open")}
                         placeholder="10:00"
                         size={Math.max(form.open.length, 4)}
@@ -288,7 +327,7 @@ export function MyPage() {
                       <span className="sep">~</span>
 
                       <S.TimeInput
-                        value={form.close}
+                        value={`${myInfo?.closeTime}:00`}
                         onChange={onChange("close")}
                         placeholder="21:00"
                         size={Math.max(form.close.length, 4)}
@@ -311,7 +350,7 @@ export function MyPage() {
                   <S.Label>휴무일</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.holiday}
+                      value={myInfo?.closedDays}
                       onChange={onChange("holiday")}
                       placeholder="연중무휴"
                     />
