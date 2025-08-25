@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, useRef, useId } from "react";
 import * as S from "../styles/pages/MyPage.styles";
 import tabsInfoOn from "../assets/mypage_info.svg";
 import tabsLogsOn from "../assets/mypage_logs.svg";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import axios from "axios";
 
 type Form = {
@@ -23,16 +23,51 @@ type Promotion = {
   createdAt?: string;
 };
 
-// 훅이 아니라 헬퍼 함수이므로 컴포넌트 밖에 둬도 됨
+type MyInfoApi = {
+  storeId: number;
+  storeName: string;
+  storeImage?: string;
+  information?: string;
+  location?: string;
+  storeTime?: number;
+  closedDays?: string;
+  reservation?: boolean;
+  menu?: string;
+  count?: number;
+  convenience?: {
+    wifi?: boolean;
+    outlet?: boolean;
+    pet?: boolean;
+    packagingDelivery?: boolean;
+  };
+};
+
 const timeFromNow = (iso?: string) => {
   if (!iso) return "";
   const d = new Date(iso);
-  const diff = (Date.now() - d.getTime()) / 1000; // sec
+  const diff = (Date.now() - d.getTime()) / 1000;
   if (diff < 60) return `${Math.floor(diff)}초 전`;
   if (diff < 3600) return `${Math.floor(diff / 60)}분 전`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}시간 전`;
   return `${Math.floor(diff / 86400)}일 전`;
 };
+
+const toHHMM = (n?: number) => {
+  if (typeof n !== "number" || isNaN(n)) return undefined;
+  const s = n.toString().padStart(4, "0");
+  return `${s.slice(0, 2)}:${s.slice(2)}`;
+};
+
+const mapApiToForm = (api: MyInfoApi, prev: Form): Form => ({
+  name: api.storeName ?? prev.name,
+  type: prev.type,
+  oneLiner: api.information ?? prev.oneLiner,
+  location: api.location ?? prev.location,
+  open: toHHMM(api.storeTime) ?? prev.open,
+  close: prev.close,
+  lastOrder: prev.lastOrder,
+  holiday: api.closedDays ?? prev.holiday,
+});
 
 const DEFAULT_FORM: Form = {
   name: "스타벅스",
@@ -70,10 +105,28 @@ export function MyPage() {
   ];
   const [amenities, setAmenities] = useState<string[]>(amenitiesAll);
 
-  // ✅ 여기부터 추가된 부분 (컴포넌트 내부 최상단에 위치)
   const [myPromotion, setMyPromotion] = useState<Promotion[]>([]);
   const [promoLoading, setPromoLoading] = useState(true);
   const [promoError, setPromoError] = useState<unknown>(null);
+
+  const [infoLoading, setInfoLoading] = useState(true);
+  const [infoError, setInfoError] = useState<unknown>(null);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const fileInputId = useId();
+
+  useEffect(() => {
+    try {
+      const f = localStorage.getItem(LS_FORM);
+      const p = localStorage.getItem(LS_PROFILE);
+      const m = localStorage.getItem(LS_MENU);
+      const a = localStorage.getItem(LS_AMENITIES);
+      if (f) setForm(JSON.parse(f));
+      if (p && !p.startsWith("blob:")) setProfile({ url: p });
+      if (m) setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
+      if (a) setAmenities(JSON.parse(a));
+    } catch {}
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -99,23 +152,38 @@ export function MyPage() {
     };
   }, []);
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const fileInputId = useId();
-
   useEffect(() => {
-    try {
-      const f = localStorage.getItem(LS_FORM);
-      const p = localStorage.getItem(LS_PROFILE);
-      const m = localStorage.getItem(LS_MENU);
-      const a = localStorage.getItem(LS_AMENITIES);
-      if (f) setForm(JSON.parse(f));
-      if (p && !p.startsWith("blob:")) setProfile({ url: p }); // blob 저장 무시
-      if (m) setMenuImages((JSON.parse(m) as string[]).map((u) => ({ url: u })));
-      if (a) setAmenities(JSON.parse(a));
-    } catch {}
+    let mounted = true;
+    (async () => {
+      try {
+        setInfoLoading(true);
+        setInfoError(null);
+        const { data } = await axios.get<any>(
+          "http://3.34.142.160:8081/api/dashboard/stores/1"
+        );
+        const payload: MyInfoApi = (data?.data ?? data) as MyInfoApi;
+        if (!mounted) return;
+        if (payload && typeof payload === "object") {
+          setForm((prev) => mapApiToForm(payload, prev));
+        } else {
+          throw new Error("Unexpected response shape for MyInfo");
+        }
+      } catch (e: any) {
+        if (mounted) setInfoError(e);
+        console.log("MYINFO_ERROR =>", {
+          message: e?.message,
+          status: e?.response?.status,
+          data: e?.response?.data,
+        });
+      } finally {
+        if (mounted) setInfoLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // 자동 저장 
   useEffect(() => {
     const t = setTimeout(() => {
       try {
@@ -152,7 +220,7 @@ export function MyPage() {
   };
 
   const oneLinerCount = useMemo(
-    () => `${Math.min(form.oneLiner.length, ONE_LINER_MAX)}/${ONE_LINER_MAX}`,
+    () => `${Math.min((form.oneLiner ?? "").length, ONE_LINER_MAX)}/${ONE_LINER_MAX}`,
     [form.oneLiner]
   );
 
@@ -203,18 +271,27 @@ export function MyPage() {
             <S.InfoCard>
               <S.InfoHead>내 가게 정보</S.InfoHead>
               <S.Divider />
+
+              {infoLoading ? (
+                <div style={{ padding: 12 }}>내 정보 불러오는 중…</div>
+              ) : infoError ? (
+                <div style={{ padding: 12, color: "#c00" }}>
+                  내 정보를 불러오는 중 오류가 발생했습니다.
+                </div>
+              ) : null}
+
               <S.InfoBody>
                 <S.Row $mb={60}>
                   <S.Label>상호명</S.Label>
                   <S.Value>
-                    <S.Input value={form.name} onChange={onChange("name")} />
+                    <S.Input value={form.name ?? ""} onChange={onChange("name")} />
                   </S.Value>
                 </S.Row>
 
                 <S.Row $mb={60}>
                   <S.Label>업종</S.Label>
                   <S.Value>
-                    <S.Input value={form.type} onChange={onChange("type")} />
+                    <S.Input value={form.type ?? ""} onChange={onChange("type")} />
                   </S.Value>
                 </S.Row>
 
@@ -255,7 +332,7 @@ export function MyPage() {
                     <S.OneLinerWrap>
                       <S.OneLiner
                         maxLength={ONE_LINER_MAX}
-                        value={form.oneLiner}
+                        value={form.oneLiner ?? ""}
                         onChange={onChange("oneLiner")}
                         placeholder="바닷가 감성을 담은 여름 시즌 한정 카페"
                       />
@@ -268,7 +345,7 @@ export function MyPage() {
                   <S.Label>위치</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.location}
+                      value={form.location ?? ""}
                       onChange={onChange("location")}
                       placeholder="주소를 입력하세요"
                       style={{ width: "100%" }}
@@ -283,27 +360,27 @@ export function MyPage() {
                       <span className="label">매일</span>
 
                       <S.TimeInput
-                        value={form.open}
+                        value={form.open ?? ""}
                         onChange={onChange("open")}
                         placeholder="10:00"
-                        size={Math.max(form.open.length, 4)}
+                        size={Math.max((form.open ?? "").length, 4)}
                       />
                       <span className="sep">~</span>
 
                       <S.TimeInput
-                        value={form.close}
+                        value={form.close ?? ""}
                         onChange={onChange("close")}
                         placeholder="21:00"
-                        size={Math.max(form.close.length, 4)}
+                        size={Math.max((form.close ?? "").length, 4)}
                       />
 
                       <span className="lp">(라스트 오더</span>
 
                       <S.TimeInput
-                        value={form.lastOrder}
+                        value={form.lastOrder ?? ""}
                         onChange={onChange("lastOrder")}
                         placeholder="20:30"
-                        size={Math.max(form.lastOrder.length, 4)}
+                        size={Math.max((form.lastOrder ?? "").length, 4)}
                       />
                       <span className="rp">)</span>
                     </S.TimeLine>
@@ -314,7 +391,7 @@ export function MyPage() {
                   <S.Label>휴무일</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.holiday}
+                      value={form.holiday ?? ""}
                       onChange={onChange("holiday")}
                       placeholder="연중무휴"
                     />
@@ -378,13 +455,13 @@ export function MyPage() {
           >
             <S.TabHitInfo
               role="tab"
-              aria-selected={isInfo} // ✅ 비교 대신 불린 사용
+              aria-selected={isInfo}
               aria-label="나의 정보"
               onClick={() => setActiveTab("info")}
             />
             <S.TabHitLogs
               role="tab"
-              aria-selected={!isInfo} // ✅ 반대 불린
+              aria-selected={!isInfo}
               aria-label="기록 보기"
               onClick={() => setActiveTab("logs")}
             />
@@ -393,7 +470,6 @@ export function MyPage() {
 
         <S.LogsArtboard>
           <S.LogsWrapper>
-            {/* 저장 목록 */}
             <S.SavedListCard>
               <S.LogsHead>저장 목록</S.LogsHead>
               <S.Divider />
@@ -423,7 +499,6 @@ export function MyPage() {
               </S.SavedBody>
             </S.SavedListCard>
 
-            {/* 나의 AI 홍보글 목록 */}
             <S.ArticlesListCard>
               <S.LogsHead>나의 AI 홍보글 목록</S.LogsHead>
               <S.Divider />
