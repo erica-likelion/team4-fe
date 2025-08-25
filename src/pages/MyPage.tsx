@@ -4,6 +4,7 @@ import tabsInfoOn from "../assets/mypage_info.svg";
 import tabsLogsOn from "../assets/mypage_logs.svg";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { MyInfo } from "../components/MyInfo";
 
 type Form = {
   name: string;
@@ -24,22 +25,21 @@ type Promotion = {
 };
 
 type MyInfoApi = {
-  storeId: number;
-  storeName: string;
+  storeId?: number;
+  storeName?: string;
   storeImage?: string;
   information?: string;
   location?: string;
-  storeTime?: number;
+  openTime?: number; // e.g. 9 or 930
+  closeTime?: number; // e.g. 23 or 2130
   closedDays?: string;
   reservation?: boolean;
-  menu?: string;
   count?: number;
-  convenience?: {
-    wifi?: boolean;
-    outlet?: boolean;
-    pet?: boolean;
-    packagingDelivery?: boolean;
-  };
+  businessType?: string; // e.g. "카페"
+  wifi?: boolean;
+  outlet?: boolean;
+  pet?: boolean;
+  packagingDelivery?: boolean;
 };
 
 const timeFromNow = (iso?: string) => {
@@ -52,19 +52,21 @@ const timeFromNow = (iso?: string) => {
   return `${Math.floor(diff / 86400)}일 전`;
 };
 
+// 9 -> "09:00", 930 -> "09:30"
 const toHHMM = (n?: number) => {
   if (typeof n !== "number" || isNaN(n)) return undefined;
-  const s = n.toString().padStart(4, "0");
+  if (n < 24) return `${String(n).padStart(2, "0")}:00`;
+  const s = String(n).padStart(4, "0");
   return `${s.slice(0, 2)}:${s.slice(2)}`;
 };
 
 const mapApiToForm = (api: MyInfoApi, prev: Form): Form => ({
   name: api.storeName ?? prev.name,
-  type: prev.type,
+  type: api.businessType ?? prev.type,
   oneLiner: api.information ?? prev.oneLiner,
   location: api.location ?? prev.location,
-  open: toHHMM(api.storeTime) ?? prev.open,
-  close: prev.close,
+  open: toHHMM(api.openTime) ?? prev.open,
+  close: toHHMM(api.closeTime) ?? prev.close,
   lastOrder: prev.lastOrder,
   holiday: api.closedDays ?? prev.holiday,
 });
@@ -90,7 +92,7 @@ type Img = { file?: File; url: string };
 
 export function MyPage() {
   const [activeTab, setActiveTab] = useState<"info" | "logs">("info");
-  const [form, setForm] = useState<Form>(DEFAULT_FORM);
+  const [form, setForm] = useState<MyInfoApi | null>(null);
   const [profile, setProfile] = useState<Img | null>(null);
   const [menuImages, setMenuImages] = useState<Img[]>([]);
   const amenitiesAll = [
@@ -152,6 +154,16 @@ export function MyPage() {
     };
   }, []);
 
+  const deriveAmenitiesFromApi = (api: MyInfoApi) => {
+    const arr: string[] = [];
+    if (api.wifi) arr.push("Wifi 제공");
+    if (api.outlet) arr.push("콘센트 사용 가능");
+    if (api.pet) arr.push("반려동물 동반 가능");
+    if (api.reservation) arr.push("예약 가능");
+    // 나머지(노트북/충전/주차/유모차)는 API에 필드가 없으므로 그대로 유지
+    return arr.length ? Array.from(new Set([...amenities, ...arr])) : amenities;
+  };
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -159,12 +171,20 @@ export function MyPage() {
         setInfoLoading(true);
         setInfoError(null);
         const { data } = await axios.get<any>(
-          "http://3.34.142.160:8081/api/dashboard/stores/1"
+          "http://3.34.142.160:8081/api/dashboard/stores/22"
         );
         const payload: MyInfoApi = (data?.data ?? data) as MyInfoApi;
         if (!mounted) return;
+        console.log(data);
         if (payload && typeof payload === "object") {
-          setForm((prev) => mapApiToForm(payload, prev));
+          // 폼 채우기
+          setForm(data);
+          // 프로필 이미지가 있으면 반영
+          if (payload.storeImage) {
+            setProfile({ url: payload.storeImage });
+          }
+          // 편의시설 동기화
+          setAmenities(deriveAmenitiesFromApi(payload));
         } else {
           throw new Error("Unexpected response shape for MyInfo");
         }
@@ -182,7 +202,7 @@ export function MyPage() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, []); // 최초 1회
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -191,7 +211,10 @@ export function MyPage() {
         const safeProfileUrl =
           profile?.url && !profile.url.startsWith("blob:") ? profile.url : "";
         localStorage.setItem(LS_PROFILE, safeProfileUrl);
-        localStorage.setItem(LS_MENU, JSON.stringify(menuImages.map((i) => i.url)));
+        localStorage.setItem(
+          LS_MENU,
+          JSON.stringify(menuImages.map((i) => i.url))
+        );
         localStorage.setItem(LS_AMENITIES, JSON.stringify(amenities));
       } catch {}
     }, 300);
@@ -219,10 +242,6 @@ export function MyPage() {
     );
   };
 
-  const oneLinerCount = useMemo(
-    () => `${Math.min((form.oneLiner ?? "").length, ONE_LINER_MAX)}/${ONE_LINER_MAX}`,
-    [form.oneLiner]
-  );
 
   useEffect(() => {
     return () => {
@@ -284,14 +303,14 @@ export function MyPage() {
                 <S.Row $mb={60}>
                   <S.Label>상호명</S.Label>
                   <S.Value>
-                    <S.Input value={form.name ?? ""} onChange={onChange("name")} />
+                    <S.Input value={form?.storeName ?? ""} onChange={onChange("name")} />
                   </S.Value>
                 </S.Row>
 
                 <S.Row $mb={60}>
                   <S.Label>업종</S.Label>
                   <S.Value>
-                    <S.Input value={form.type ?? ""} onChange={onChange("type")} />
+                    <S.Input value={"카페"} onChange={onChange("type")} />
                   </S.Value>
                 </S.Row>
 
@@ -299,14 +318,11 @@ export function MyPage() {
                   <S.Label>프로필 이미지</S.Label>
                   <S.Value>
                     <S.Profile>
-                      <S.ProfileIcon160
-                        $empty={isProfileEmpty}
-                        htmlFor={fileInputId}
-                      >
+                      <S.ProfileIcon160 $empty={isProfileEmpty} htmlFor={fileInputId}>
                         {!isProfileEmpty ? (
                           <S.ProfileImg
                             key={profile!.url}
-                            src={profile!.url}
+                            src={form?.storeImage}
                             alt=""
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
@@ -332,11 +348,10 @@ export function MyPage() {
                     <S.OneLinerWrap>
                       <S.OneLiner
                         maxLength={ONE_LINER_MAX}
-                        value={form.oneLiner ?? ""}
+                        value={form?.information}
                         onChange={onChange("oneLiner")}
                         placeholder="바닷가 감성을 담은 여름 시즌 한정 카페"
                       />
-                      <S.Counter>{oneLinerCount}</S.Counter>
                     </S.OneLinerWrap>
                   </S.Value>
                 </S.Row>
@@ -345,7 +360,7 @@ export function MyPage() {
                   <S.Label>위치</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.location ?? ""}
+                      value={form?.location ?? ""}
                       onChange={onChange("location")}
                       placeholder="주소를 입력하세요"
                       style={{ width: "100%" }}
@@ -360,27 +375,27 @@ export function MyPage() {
                       <span className="label">매일</span>
 
                       <S.TimeInput
-                        value={form.open ?? ""}
+                        value={`${form?.openTime}:00`}
                         onChange={onChange("open")}
                         placeholder="10:00"
-                        size={Math.max((form.open ?? "").length, 4)}
+                        size={4}
                       />
                       <span className="sep">~</span>
 
                       <S.TimeInput
-                        value={form.close ?? ""}
+                        value={`${form?.closeTime}:00`}
                         onChange={onChange("close")}
                         placeholder="21:00"
-                        size={Math.max((form.close ?? "").length, 4)}
+                        size={4}
                       />
 
                       <span className="lp">(라스트 오더</span>
 
                       <S.TimeInput
-                        value={form.lastOrder ?? ""}
+                        value={"20:30"}
                         onChange={onChange("lastOrder")}
                         placeholder="20:30"
-                        size={Math.max((form.lastOrder ?? "").length, 4)}
+                        size={Math.max(("").length, 4)}
                       />
                       <span className="rp">)</span>
                     </S.TimeLine>
@@ -391,7 +406,7 @@ export function MyPage() {
                   <S.Label>휴무일</S.Label>
                   <S.Value>
                     <S.Input
-                      value={form.holiday ?? ""}
+                      value={form?.closedDays ?? ""}
                       onChange={onChange("holiday")}
                       placeholder="연중무휴"
                     />
