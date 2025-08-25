@@ -10,16 +10,41 @@ export function Create() {
   const [tagList, setTagList] = useState<string[]>([]);
   const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [request, setRequest] = useState<string>("");
+  const [mdTitle, setMdTitle] = useState<string>("");
+  const [mdContent, setMdContent] = useState<string>("");
+
+  // File -> base64 변환 함수
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // base64url 변환
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const fetchData = async () => {
-    const response = await axios.post(
-      "http://3.34.142.160:8081/api/made/user-input",
-      {
-        storeId: 1,
-        userInput: "맛있는 커피를 마시고 싶어요",
-        prompt: request,
-      }
-    );
-    console.log(response.data);
+    try {
+      // 모든 파일을 base64로 변환
+      const base64Images = await Promise.all(
+        images.map((img) => fileToBase64(img.file))
+      );
+
+      const response = await axios.post(
+        "http://3.34.142.160:8080/api/made/upload-images",
+        {
+          storeId: 1,
+          userInput: request + "마크다운 형식으로 뽑아줘",
+          hashTag: tagList.join(","),
+          detailRequest: request + "마크다운 형식으로 뽑아줘",
+          images: [],
+        }
+      );
+      setMdTitle(response.data.resultTitle);
+      setMdContent(response.data.resultContent);
+    } catch (err) {
+      console.error("업로드 실패:", err);
+    }
   };
 
   return (
@@ -46,7 +71,7 @@ export function Create() {
           </S.CreateButtonWrap>
         </S.LeftWrap>
       </S.LeftContainer>
-      <GPTResult />
+      <GPTResult mdTitle={mdTitle} mdContent={mdContent} />
     </S.CreateContainer>
   );
 }

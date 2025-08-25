@@ -43,7 +43,7 @@ export function MyInfo({
     const fetchStoreData = async () => {
       try {
         const response = await axios.get(
-          "http://3.34.142.160:8081/api/dashboard/stores/22"
+          "http://3.34.142.160:8080/api/dashboard/stores/1"
         );
         console.log(response.data);
         setMyInfo(response.data);

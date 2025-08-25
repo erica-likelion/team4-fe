@@ -92,9 +92,9 @@ export function MyPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://3.34.142.160:8081/api/dashboard/store/22"
+          "http://3.34.142.160:8080/api/dashboard/stores/1"
         );
-        console.log(response.data);
+        setMyInfo(response.data);
       } catch (error) {
         console.error("Error fetching store data:", error);
       }
@@ -106,7 +106,7 @@ export function MyPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://3.34.142.160:8081/api/community/stores/1/promotions"
+          "http://3.34.142.160:8080/api/community/stores/1/promotions"
         );
         setMyPromotion(response.data);
       } catch (error) {
