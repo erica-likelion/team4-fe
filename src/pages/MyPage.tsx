@@ -17,8 +17,8 @@ type Form = {
 };
 
 const DEFAULT_FORM: Form = {
-  name: "스타벅스",
-  type: "카페",
+  name: "스타벅스1",
+  type: "카페1",
   oneLiner: "바닷가 감성을 담은 여름 시즌 한정 카페",
   location: "안산시 상록구 000-000000",
   open: "10:00",
